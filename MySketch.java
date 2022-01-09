@@ -6,6 +6,14 @@ public class MySketch extends PApplet {
   ArtNetClient artnet;
   byte[] dmxData = new byte[512];
 
+  String[] ips = {
+    "192.168.1.8",
+    "192.168.1.25"
+  };
+
+  public void setup() {
+    frameRate(30);
+  }
   public void settings() {
     size(500, 500);
     artnet = new ArtNetClient(null);
@@ -17,10 +25,17 @@ public class MySketch extends PApplet {
     ellipse(250, 250, 20, 20);
     loadPixels();
     byte r = (byte) red(pixels[500 * mouseY + mouseX]);
-    System.out.println(r);
     dmxData[0] = r;
-    artnet.unicastDmx("127.0.0.1", 0, 0, dmxData);
-    artnet.unicastDmx("127.0.0.1", 0, 1, dmxData);
+
+    for(int j = 56; j < dmxData.length; j = j + 3) {
+        dmxData[j] = r;
+        dmxData[j+1] = (byte)255;
+        dmxData[j+2] = (byte)255;
+    }
+
+    for(int i = 0; i < ips.length; i++) {
+        artnet.unicastDmx(ips[i], 0, 0, dmxData);
+    }
   }
 
   public static void main(String[] passedArgs) {
